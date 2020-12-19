@@ -7,77 +7,64 @@ import java.util.Random;
 public class Main {
 
 
-    static Random random = new Random();
+    static int spf[];
+    //static Random random = new Random();
 
 
-
-    public static int amountOfNumbers(int k, int s) {
-
-        int max_power = 1;
-
-        for (int i = 1; i <= k; ++i) {
-            max_power *= 10;
-        }
-
-        int result = 0;
-
-        for (int i = max_power/10; i <= max_power-1; ++i) {
-            if (digitsSum(i) == s)
-                result++;
-        }
-
-        return result;
-
+    public static int zeroOneSeq(int a, int b) {
+        if (a > b+1)
+            return 0;
+        if (a==0 || b==0)
+            return 1;
+        return zeroOneSeq(a,b-1)+zeroOneSeq(a-1,b-1);
     }
 
 
-
-    public static int digitsSum(int x) {
-        if (x == 0)
-            return x;
-        return x%10 + digitsSum(x/10);
-
-    }
-
-
-
-
-    public static int gcd(int a, int b) {
-        int max = max(a,b);
-        int min = min(a,b);
-        if (max % min == 0)
-            return min;
-        return gcd(min, max % min);
-    }
-
-
-
-    public static int power(int a, int n, int m) {
-
-        int result = 1;
-
-        a = a % m;
-
-        while (n > 0) {
-            if (n % 2 == 1)
-                result = (result * a) % m;
-            n = n / 2;
-            a = (a * a) % m;
-        }
-
-        return result;
-
-    }
-
-
-
-    public static boolean isPrime(int p) {
-        int a = 2 + random.nextInt(p-2);
-        if (gcd(a,p) != 1)
+    public static boolean isPalindrome(String str, int left) {
+        int right = str.length() - left - 1;
+        if (str.charAt(left) != str.charAt(right))
             return false;
-        return power(a,p-1, p) == 1;
+        if (left == right)
+            return true;
+        else
+            return isPalindrome(str, left+1);
     }
 
+
+    public static void sieve(int x) {
+
+        spf = new int[x+1];
+
+        spf[1] = 1;
+
+        for (int i = 2; i < x+1; i++)
+            spf[i] = i;
+        for (int i = 4; i < x+1; i+=2)
+            spf[i] = 2;
+
+        for (int i = 3; i*i < x+1; i++) {
+            if (spf[i] == i) {
+                for (int j = i*i; j < x+1; j += i) {
+                    if (spf[j] == j)
+                        spf[j] = i;
+                }
+            }
+        }
+
+    }
+
+
+
+    public static void printPrimeFactors(int x) {
+
+        sieve(x);
+
+        while (x != 1) {
+            System.out.print(spf[x] + " ");
+            x = x / spf[x];
+        }
+
+    }
 
 
 
@@ -85,35 +72,32 @@ public class Main {
 
         Scanner in = new Scanner(System.in);
 
-        System.out.print("Введите числа k и s: ");
-        int k = in.nextInt();
-        int s = in.nextInt();
+        System.out.print("Введите число для разбиения на простые множители: ");
+        int factorizeNum = in.nextInt();
 
-        System.out.print("Введите число для получения суммы цифр: ");
-        int numToSum = in.nextInt();
+        in = new Scanner(System.in);
 
-        System.out.print("Введите число для проверки его простоты: ");
-        int checkPrimeNum = in.nextInt();
+        System.out.print("Введите строку для проверки на палиндром: ");
+        String palCandidate = in.nextLine();
+
+        System.out.println("Введите числа a и b: ");
+        int a = in.nextInt();
+        int b = in.nextInt();
 
         in.close();
 
+        System.out.print("Простые множители числа " + factorizeNum + " : ");
+        printPrimeFactors(factorizeNum);
 
-        int amount = amountOfNumbers(k,s);
-        int sumOfDigits = digitsSum(numToSum);
-        boolean isPrimeNum = isPrime(checkPrimeNum);
-
-
-        System.out.println("Количество чисел: " + amount);
-
-        System.out.println("сумма цифр: " + sumOfDigits);
+        System.out.print("\nЯвляется ли слово '" + palCandidate + "' палиндромом: ");
 
 
-        System.out.print("Является ли " + checkPrimeNum + " простым числом: ");
-
-        if (isPrimeNum)
-            System.out.println("YES");
+        if (isPalindrome(palCandidate, 0))
+            System.out.println("Да");
         else
-            System.out.println("NO");
+            System.out.println("Нет");
+
+        System.out.println("Количество последовательностей 0 и 1: " + zeroOneSeq(a,b));
 
     }
 
